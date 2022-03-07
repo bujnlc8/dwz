@@ -60,7 +60,7 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
     let port = get_bind_port();
     HttpServer::new(|| {
-        let tera = Tera::new(concat!(env!("CARGO_MANIFEST_DIR"), "/templates/**/*")).unwrap();
+        let tera = Tera::new("templates/**/*").unwrap();
         App::new()
             .app_data(web::Data::new(tera))
             .wrap(middleware::Logger::default())

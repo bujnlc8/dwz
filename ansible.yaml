@@ -1,0 +1,17 @@
+- hosts: q_cloud
+  remote_user: root
+  tasks:
+    - name: deploy dwz...
+      docker_container:
+        name: dwz
+        image: yy194131/dwz:{{image_tag}}
+        state: started
+        pull: true
+        restart: true
+        restart_policy: always
+        env:
+          DATABASE_URL: "{{DATABASE_URL}}"
+        published_ports:
+          - "12345:8080"
+        volumes:
+          - /etc/localtime:/etc/localtime:ro

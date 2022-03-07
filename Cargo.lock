@@ -514,6 +514,7 @@ dependencies = [
  "diesel",
  "env_logger",
  "fastmurmur3",
+ "mysqlclient-sys",
  "serde",
  "tera",
 ]
