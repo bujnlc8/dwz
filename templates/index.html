@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="/shorten" method="POST">
+    <div>原始链接：<input name="long_url" style="width:360px;height:28px;border-radius: 5px;" required>
+    </div>
+    <div style="margin-top:10px;">
+    有效时间：<input name="valid_time" placeholder="2022-12-31 23:59:59" style="width:160px;height:28px;border-radius: 5px;" required>
+    </div>
+    <button type="submit" style="height:28px;">提交</button>
+</form>
+{% endblock content %}
