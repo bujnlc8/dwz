@@ -30,8 +30,7 @@ fn get_bind_port() -> u16 {
 }
 
 async fn render_admin(tmpl: web::Data<Tera>, _req: HttpRequest) -> HttpResponse {
-    let mut ctx = Context::new();
-    ctx.insert("name", "hello");
+    let ctx = Context::new();
     let rendered = tmpl.render("index.html", &ctx).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
@@ -42,13 +41,14 @@ async fn shorten(params: web::Form<Params>) -> Result<HttpResponse> {
         Ok(e) => Ok(HttpResponse::Ok()
             .content_type("text/html;charset=utf8")
             .body(format!(
-                "原始链接:{}<br>短链接:dwz0.tk/{}<br><a href='/'>返回</a>",
-                params.long_url, e
+                "原始链接: {}<br>短链接: dwz0.tk/{}<br><a href='/'>返回</a>",
+                params.long_url.trim(),
+                e
             ))),
         Err(e) => Ok(HttpResponse::Ok()
             .content_type("text/html;charset=utf8")
             .body(format!(
-                "Something went wrong, {} <br><a href='/'>返回</a>",
+                "Oooops...Something went wrong, {} <br><a href='/'>返回</a>",
                 e,
             ))),
     }

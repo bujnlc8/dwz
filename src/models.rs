@@ -1,5 +1,6 @@
 use super::schema::dwz;
 use diesel::Queryable;
+use std::fmt::Display;
 
 #[derive(Queryable)]
 pub struct Dwz {
@@ -17,4 +18,14 @@ pub struct NewDwz<'a> {
     pub redirect_url: &'a str,
     pub valid_time: chrono::NaiveDateTime,
     pub create_time: chrono::NaiveDateTime,
+}
+
+pub struct CommonError {
+    pub message: String,
+}
+
+impl Display for CommonError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.message)
+    }
 }

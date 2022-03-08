@@ -1,5 +1,6 @@
 use crate::models::*;
 
+use super::models::CommonError;
 use crate::establish_connection;
 use crate::schema::dwz;
 use crate::schema::dwz::dsl::*;
@@ -26,7 +27,22 @@ pub fn get_record(url: &String) -> QueryResult<Dwz> {
     record
 }
 
-pub fn insert_data(url: &String, valid: &String) -> Result<String, diesel::result::Error> {
+pub fn insert_data(url: &String, valid: &String) -> Result<String, CommonError> {
+    let url = &url.trim().to_string();
+    if url.len() <= 0 {
+        return Err(CommonError {
+            message: "url is blank!".to_string(),
+        });
+    }
+    let parsed_valid_time;
+    match NaiveDateTime::parse_from_str(valid, "%Y-%m-%d %H:%M:%S") {
+        Ok(e) => parsed_valid_time = e,
+        Err(e) => {
+            return Err(CommonError {
+                message: format!("parse datetime error: {}", e),
+            })
+        }
+    }
     let u = fastmurmur3::hash(url.as_bytes());
     let mut h = format!("{:x}", u)[..6].to_string();
     let record = get_record(&h);
@@ -44,13 +60,17 @@ pub fn insert_data(url: &String, valid: &String) -> Result<String, diesel::resul
                 return Ok(h);
             } else {
                 // 更新有效期
-                diesel::update(dwz.filter(id.eq(exist_ef.id)))
-                    .set(
-                        valid_time
-                            .eq(NaiveDateTime::parse_from_str(valid, "%Y-%m-%d %H:%M:%S").unwrap()),
-                    )
-                    .execute(connection)?;
-                return Ok(h);
+                match diesel::update(dwz.filter(id.eq(exist_ef.id)))
+                    .set(valid_time.eq(parsed_valid_time))
+                    .execute(connection)
+                {
+                    Ok(_) => return Ok(h),
+                    Err(e) => {
+                        return Err(CommonError {
+                            message: format!("update valid_time error: {}", e),
+                        })
+                    }
+                }
             }
         } else {
             // 产生冲突
@@ -69,6 +89,8 @@ pub fn insert_data(url: &String, valid: &String) -> Result<String, diesel::resul
         .execute(connection)
     {
         Ok(_) => Ok(h),
-        Err(e) => Err(e),
+        Err(e) => Err(CommonError {
+            message: format!("insert data error: {}", e),
+        }),
     }
 }
