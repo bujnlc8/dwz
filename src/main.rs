@@ -14,7 +14,7 @@ pub struct Params {
 async fn index(path: web::Path<(String,)>) -> HttpResponse {
     let query = &path.0;
     let redirect_url = get_redirect_url(query);
-    if redirect_url.len() <= 0 {
+    if redirect_url.is_empty() {
         return HttpResponse::NotFound().finish();
     }
     HttpResponse::Found()
