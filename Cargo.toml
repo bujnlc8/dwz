@@ -2,9 +2,7 @@
 name = "dwz"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
+description = "Shorten url"
 
 [dependencies]
 actix-web = "4"
@@ -14,3 +12,9 @@ chrono = "0.4"
 tera = "1.15.0"
 fastmurmur3 = "0.1.2"
 serde = { version = "1", features = ["derive"] }
+
+[profile.release]
+lto = true
+strip = true
+opt-level = "z"
+codegen-units = 1

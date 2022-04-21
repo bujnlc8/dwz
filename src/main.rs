@@ -8,7 +8,7 @@ use tera::{Context, Tera};
 #[derive(Serialize, Deserialize)]
 pub struct Params {
     long_url: String,
-    valid_time: String,
+    valid_time: Option<String>,
 }
 
 async fn index(path: web::Path<(String,)>) -> HttpResponse {
@@ -35,15 +35,32 @@ async fn render_admin(tmpl: web::Data<Tera>, _req: HttpRequest) -> HttpResponse 
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
+fn get_valid_time(params: &web::Form<Params>) -> String {
+    let mut valid_time = "2222-02-22 22:22:22".to_string();
+    if let Some(e) = &params.valid_time {
+        let s = e.to_owned().trim().to_string();
+        if !s.is_empty() {
+            valid_time = s;
+        }
+    }
+    valid_time
+}
+
+fn get_full_url(path: &str) -> String {
+    match std::env::var("DWZ_HOST") {
+        Err(_) => format!("dwz0.tk/{}", path),
+        Ok(e) => format!("{}/{}", e, path),
+    }
+}
+
 async fn shorten(params: web::Form<Params>) -> Result<HttpResponse> {
-    let short = insert_data(&params.long_url, &params.valid_time);
-    match short {
+    match insert_data(&params.long_url, &get_valid_time(&params)) {
         Ok(e) => Ok(HttpResponse::Ok()
             .content_type("text/html;charset=utf8")
             .body(format!(
-                "原始链接: {}<br>短链接: dwz0.tk/{}<br><a href='/'>返回</a>",
+                "原始链接: <span style='word-wrap: break-word;color:grey;'>{}</span><br>短链接: {}<br><a href='/'>返回</a>",
                 params.long_url.trim(),
-                e
+                get_full_url(e.as_str()),
             ))),
         Err(e) => Ok(HttpResponse::Ok()
             .content_type("text/html;charset=utf8")
@@ -51,6 +68,28 @@ async fn shorten(params: web::Form<Params>) -> Result<HttpResponse> {
                 "Oooops...Something went wrong, {} <br><a href='/'>返回</a>",
                 e,
             ))),
+    }
+}
+
+#[derive(Serialize)]
+pub struct Resp {
+    success: bool,
+    data: Option<String>,
+    msg: Option<String>,
+}
+
+async fn api_shorten(params: web::Form<Params>) -> Result<HttpResponse> {
+    match insert_data(&params.long_url, &get_valid_time(&params)) {
+        Ok(e) => Ok(HttpResponse::Ok().json(Resp {
+            success: true,
+            data: Some(get_full_url(e.as_str())),
+            msg: None,
+        })),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(Resp {
+            success: false,
+            data: None,
+            msg: Some(format!("{}", e)),
+        })),
     }
 }
 
@@ -65,6 +104,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(tera))
             .wrap(middleware::Logger::default())
             .service(web::resource("/shorten").route(web::post().to(shorten)))
+            .service(web::resource("/url").route(web::post().to(api_shorten)))
             .service(web::resource("/").route(web::get().to(render_admin)))
             .service(web::resource("").route(web::get().to(render_admin)))
             .route("/{path}", web::get().to(index))

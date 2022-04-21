@@ -2,10 +2,10 @@
 
 {% block content %}
 <form action="/shorten" method="POST">
-    <div>原始链接：<textarea name="long_url" style="border-radius: 5px;padding:10px;" required cols="120" rows="8"></textarea>
+    <div>原始链接：<textarea name="long_url" style="border-radius: 5px;padding:10px;width:80%;" required rows="8"></textarea>
     </div>
     <div style="margin-top:10px;">
-    过期时间：<input name="valid_time" placeholder="2022-12-31 23:59:59" style="width:160px;height:28px;border-radius: 5px;border:1px solid;" required value="2222-02-22 22:22:22">
+    过期时间：<input name="valid_time" placeholder="2222-02-22 22:22:22" style="width:160px;height:28px;border-radius: 5px;border:1px solid;">
     </div>
     <button type="submit" style="height:28px;margin-top:10px;width:120px;text-align:center;">提交</button>
     <p style="font-size:12px;color:black;margin-top:8px;">*严禁用于非法用途</p>
