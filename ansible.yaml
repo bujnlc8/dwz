@@ -10,7 +10,9 @@
         restart: true
         restart_policy: always
         env:
-          DATABASE_URL: "{{DATABASE_URL}}"
+          DATABASE_URL: "{{ DATABASE_URL }}"
+          DWZ_HOST: "{{ DWZ_HOST }}"
+          DWZ_PORT: "{{ DWZ_PORT }}"
         published_ports:
           - "12345:8080"
         volumes:

@@ -25,7 +25,7 @@ async fn index(path: web::Path<(String,)>) -> HttpResponse {
 fn get_bind_port() -> u16 {
     match std::env::var("DWZ_PORT") {
         Err(_e) => 8080u16,
-        Ok(s) => s.parse::<u16>().unwrap(),
+        Ok(s) => s.parse::<u16>().unwrap_or(8080u16),
     }
 }
 
@@ -49,7 +49,13 @@ fn get_valid_time(params: &web::Form<Params>) -> String {
 fn get_full_url(path: &str) -> String {
     match std::env::var("DWZ_HOST") {
         Err(_) => format!("dwz0.tk/{}", path),
-        Ok(e) => format!("{}/{}", e, path),
+        Ok(e) => {
+            let e = e.trim();
+            if e.is_empty() {
+                return format!("dwz0.tk/{}", path);
+            }
+            return format!("{}/{}", e, path);
+        }
     }
 }
 

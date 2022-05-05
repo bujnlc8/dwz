@@ -67,4 +67,4 @@ jobs:
           playbookName: "ansible.yaml"
           verbosity: "vv"
           KeyFile: "id_rsa"
-          extraVars: "-e ANSIBLE_HOST_KEY_CHECKING=False -e DATABASE_URL=${{secrets.DATABASE_URL}}  -e image_tag=${{ env.RELEASE_VERSION }} -i hosts"
+          extraVars: "-e ANSIBLE_HOST_KEY_CHECKING=False -e DATABASE_URL=${{secrets.DATABASE_URL}}  -e DWZ_HOST=${{secrets.DWZ_HOST}} -e DWZ_PORT=${{secrets.DWZ_PORT}} -e image_tag=${{ env.RELEASE_VERSION }} -i hosts"
