@@ -4,7 +4,7 @@
     - name: deploy dwz...
       docker_container:
         name: dwz
-        image: yy194131/dwz:{{image_tag}}
+        image: registry.cn-beijing.aliyuncs.com/roselle-1/dwz:{{image_tag}}
         state: started
         pull: true
         restart: true
