@@ -7,7 +7,7 @@ description = "Shorten url"
 [dependencies]
 actix-web = "4"
 env_logger="0.9.0"
-diesel = { version = "1.4.8", features = ["mysql", "chrono"] }
+diesel = { version = "2.2.3", features = ["mysql", "chrono"] }
 chrono = "0.4"
 tera = "1.15.0"
 fastmurmur3 = "0.1.2"
